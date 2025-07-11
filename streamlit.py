@@ -1,35 +1,30 @@
 import streamlit as st
-import tensorflow as tf
-
-@st.cache_resource
-def load_model():
-    model = tf.keras.models.load_model('best_cifar10_model.h5')
-    return model
-
-model = load_model()
-
-st.write("""
-# cifar10 classification""")
-file = st.file_uploader("Choose weather photo from computer", type=["jpg", "png"])
-
-import cv2
-from PIL import Image, ImageOps
 import numpy as np
+from PIL import Image
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image as keras_image
 
-def import_and_predict(image_data, model):
-    size = (256, 256)  
-    image = ImageOps.fit(image_data, size, Image.Resampling.LANCZOS)
-    img = np.asarray(image).astype(np.float32) / 255.0  
-    img_reshape = np.expand_dims(img, axis=0)
-    prediction = model.predict(img_reshape)
-    return prediction
+model = load_model('models/best_cifar10_model.h5')
 
-if file is None:
-  st.text("Please upload an image file")
-else:
-  image = Image.open(file)
-  st.image(image, use_container_width=True)  
-  prediction = import_and_predict(image, model)
-  class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-  string = "The output is: " + class_names[np.argmax(prediction)]
-  st.success(string)
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
+               'dog', 'frog', 'horse', 'ship', 'truck']
+
+st.title("CIFAR-10 Image Classifier 🚀")
+st.write("Upload a CIFAR-10 image (32x32 or resized) to predict its class.")
+
+uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
+
+if uploaded_file is not None:
+    img = Image.open(uploaded_file).convert('RGB')
+    st.image(img, caption='Uploaded Image', use_column_width=False)
+
+    img = img.resize((32, 32))
+    img_array = keras_image.img_to_array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+
+    prediction = model.predict(img_array)
+    class_idx = np.argmax(prediction)
+    class_label = class_names[class_idx]
+    confidence = np.max(prediction)
+
+    st.success(f"Prediction: **{class_label}** ({confidence*100:.2f}%)")
