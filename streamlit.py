@@ -16,7 +16,7 @@ uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file).convert('RGB')
-    st.image(img, caption='Uploaded Image', use_column_width=False)
+    st.image(img, caption='Uploaded Image', use_container_width=False)
 
     img = img.resize((32, 32))
     img_array = keras_image.img_to_array(img) / 255.0
