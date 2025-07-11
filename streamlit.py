@@ -4,7 +4,7 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as keras_image
 
-model = load_model('models/best_cifar10_model.h5')
+model = load_model('best_cifar10_model.h5')
 
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
